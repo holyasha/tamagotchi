@@ -1,0 +1,232 @@
+{
+  "realm": "tamagotchi",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "accessTokenLifespan": 300,
+  "roles": {
+    "realm": [
+      {
+        "name": "service"
+      },
+      {
+        "name": "operator"
+      },
+      {
+        "name": "reader"
+      },
+      {
+        "name": "editor"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "tamagotchi-service-client",
+      "protocol": "openid-connect",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "tamagotchi-service-secret",
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "fullScopeAllowed": false,
+      "defaultClientScopes": [
+        "roles"
+      ],
+      "protocolMappers": [
+        {
+          "name": "api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "tamagotchi-recommendation-service",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "tamagotchi-ops-client",
+      "protocol": "openid-connect",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "tamagotchi-ops-secret",
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "fullScopeAllowed": false,
+      "defaultClientScopes": [
+        "roles"
+      ],
+      "protocolMappers": [
+        {
+          "name": "api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "tamagotchi-recommendation-service",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "tamagotchi-other-client",
+      "protocol": "openid-connect",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "tamagotchi-other-secret",
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "fullScopeAllowed": false,
+      "defaultClientScopes": [
+        "roles"
+      ],
+      "protocolMappers": [
+        {
+          "name": "api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "other-api",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "tamagotchi-bff",
+      "protocol": "openid-connect",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "tamagotchi-bff-secret",
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "fullScopeAllowed": false,
+      "redirectUris": [
+        "http://localhost:8088/login/oauth2/code/keycloak"
+      ],
+      "webOrigins": [
+        "http://localhost:8088"
+      ],
+      "defaultClientScopes": [
+        "web-origins",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "protocolMappers": [
+        {
+          "name": "aud-tamagotchi-pet-service",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "tamagotchi-pet-service",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "scopeMappings": [
+    {
+      "client": "tamagotchi-service-client",
+      "roles": [
+        "service"
+      ]
+    },
+    {
+      "client": "tamagotchi-ops-client",
+      "roles": [
+        "operator"
+      ]
+    },
+    {
+      "client": "tamagotchi-other-client",
+      "roles": [
+        "service"
+      ]
+    },
+    {
+      "client": "tamagotchi-bff",
+      "roles": [
+        "reader",
+        "editor"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "service-account-tamagotchi-service-client",
+      "enabled": true,
+      "serviceAccountClientId": "tamagotchi-service-client",
+      "realmRoles": [
+        "service"
+      ]
+    },
+    {
+      "username": "service-account-tamagotchi-ops-client",
+      "enabled": true,
+      "serviceAccountClientId": "tamagotchi-ops-client",
+      "realmRoles": [
+        "operator"
+      ]
+    },
+    {
+      "username": "service-account-tamagotchi-other-client",
+      "enabled": true,
+      "serviceAccountClientId": "tamagotchi-other-client",
+      "realmRoles": [
+        "service"
+      ]
+    },
+    {
+      "username": "student",
+      "firstName": "Tamagotchi",
+      "lastName": "Observer",
+      "enabled": true,
+      "email": "student@example.test",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "student",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "reader"
+      ]
+    },
+    {
+      "username": "editor",
+      "firstName": "Tamagotchi",
+      "lastName": "Caretaker",
+      "enabled": true,
+      "email": "editor@example.test",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "editor",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "reader",
+        "editor"
+      ]
+    }
+  ]
+}

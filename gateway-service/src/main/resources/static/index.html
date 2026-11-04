@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Тамагочи — веб-клиент</title>
+  <style>
+    body{max-width:900px;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif}
+    button,input{padding:.6rem;margin:.3rem} pre{padding:1rem;background:#17212d;color:white;white-space:pre-wrap}
+    label{display:inline-block;margin:.35rem}
+  </style>
+</head>
+<body>
+<h1>Система «Тамагочи»</h1>
+<p>Вход выполняется через Keycloak. Браузер хранит только сессионную cookie SESSION; OAuth-токены остаются на сервере BFF.</p>
+<p><a href="/oauth2/authorization/keycloak">Войти через Keycloak</a> · <a href="/logout">Выйти</a></p>
+<button data-url="/bff/me">Текущий пользователь</button>
+<button data-url="/api/pets">Список питомцев</button>
+<form id="pet-form">
+  <h3>Создать питомца (только EDITOR)</h3>
+  <label>Имя <input name="name" value="Пушистик" required></label>
+  <label>Вид <input name="species" value="Кот" required></label>
+  <button type="submit">Создать</button>
+</form>
+<pre id="output">После входа нажмите одну из кнопок.</pre>
+<script>
+  const output = document.getElementById('output');
+  async function show(response) {
+    const body = await response.text();
+    output.textContent = response.status + ' ' + response.statusText + '\n' + body;
+  }
+  document.querySelectorAll('button[data-url]').forEach(button => button.addEventListener('click', async () => {
+    const response = await fetch(button.dataset.url, {credentials:'same-origin'});
+    await show(response);
+  }));
+  document.getElementById('pet-form').addEventListener('submit', async event => {
+    event.preventDefault();
+    const csrfResponse = await fetch('/bff/csrf', {credentials:'same-origin'});
+    const csrf = await csrfResponse.json();
+    const form = new FormData(event.currentTarget);
+    const response = await fetch('/api/pets', {
+      method:'POST', credentials:'same-origin',
+      headers:{'Content-Type':'application/json', [csrf.headerName]:csrf.token},
+      body:JSON.stringify({name:form.get('name'), species:form.get('species')})
+    });
+    await show(response);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+server:
+  port: ${SERVER_PORT:8088}
+  reactive:
+    session:
+      cookie:
+        http-only: true
+        same-site: lax
+        secure: ${SESSION_COOKIE_SECURE:false}
+
+spring:
+  application:
+    name: tamagotchi-gateway-service
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  session:
+    timeout: 30m
+    data:
+      redis:
+        namespace: tamagotchi:gateway:sessions
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: ${OIDC_ISSUER:http://localhost:8085/realms/tamagotchi}
+        registration:
+          keycloak:
+            provider: keycloak
+            client-id: tamagotchi-bff
+            client-secret: tamagotchi-bff-secret
+            authorization-grant-type: authorization_code
+            scope: openid,profile,email
+  cloud:
+    gateway:
+      server:
+        webflux:
+          httpclient:
+            connect-timeout: 500
+            response-timeout: 3s
+          routes:
+            - id: tamagotchi-pets
+              uri: ${TAMAGOTCHI_API_URL:http://localhost:8080}
+              predicates:
+                - Path=/api/pets,/api/pets/**
+              filters:
+                - TokenRelay=
