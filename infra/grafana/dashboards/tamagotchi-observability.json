@@ -1,0 +1,259 @@
+{
+  "uid": "tamagotchi-observability",
+  "title": "Tamagotchi — Observability",
+  "schemaVersion": 41,
+  "version": 1,
+  "tags": [
+    "tamagotchi",
+    "pr7"
+  ],
+  "timezone": "browser",
+  "editable": true,
+  "refresh": "5s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Нагрузка: запросы по сервисам, RPS",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (job) (rate(http_server_requests_seconds_count{uri!~\"/actuator.*|/livez|/readyz\"}[1m]))",
+          "legendFormat": "{{job}}",
+          "range": true,
+          "exemplar": false
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Ошибки рекомендаций: доля HTTP 5xx",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "tamagotchi:recommendation_error_ratio:rate1m",
+          "legendFormat": "5xx / запросы",
+          "range": true,
+          "exemplar": false
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Задержка успешных рекомендаций: p95",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 7,
+        "w": 12,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_requests_seconds_bucket{job=\"recommendation-service\",method=\"GET\",uri=\"/internal/recommendations/{petId}\",status=\"200\"}[1m])))",
+          "legendFormat": "p95",
+          "range": true,
+          "exemplar": true
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Качество SLI: доля быстрых успешных ответов",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 7,
+        "w": 12,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "tamagotchi:recommendation_good_ratio:rate5m",
+          "legendFormat": "SLI за 5 минут",
+          "range": true,
+          "exemplar": false
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Активные вычисления рекомендаций",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 12,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "pet_recommendation_active",
+          "legendFormat": "active",
+          "range": true,
+          "exemplar": false
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Использование Heap JVM по сервисам",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 14,
+        "w": 12,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (job) (jvm_memory_used_bytes{area=\"heap\"})",
+          "legendFormat": "{{job}}",
+          "range": true,
+          "exemplar": false
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Runbook: порядок диагностики инцидента",
+      "type": "text",
+      "gridPos": {
+        "x": 0,
+        "y": 21,
+        "w": 24,
+        "h": 8
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "### 1. Определить симптом\nПроверьте нагрузку, долю HTTP 5xx, p95 и SLI. Если выросла задержка без 5xx — вероятна деградация времени обработки.\n\n### 2. Найти запрос\nВ Loki выполните `{job=\"tamagotchi-apps\"} | json | outcome=\"failure\"`. Для конкретного обращения отфильтруйте записи по `requestId`.\n\n### 3. Локализовать причину\nОткройте связанный `traceId` в Tempo и проверьте спаны gateway, pet-service и recommendation-service. Сверьте `up` в Prometheus и состояние зависимостей.\n\n### 4. Подтвердить восстановление\nВерните режим `NORMAL`, отправьте контрольные запросы и дождитесь снижения error ratio и перехода алерта в `resolved`."
+      }
+    }
+  ],
+  "annotations": {
+    "list": []
+  }
+}

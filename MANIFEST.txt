@@ -1,0 +1,25 @@
+Файлы overlay PR7:
+README-PR7.md
+compose.yaml
+gateway-service/pom.xml
+gateway-service/src/main/java/com/example/tamagotchi/gateway/SecurityConfig.java
+gateway-service/src/main/resources/application.yml
+infra/alertmanager/alertmanager.yml
+infra/alloy/config.alloy
+infra/grafana/dashboards/tamagotchi-observability.json
+infra/grafana/provisioning/dashboards/tamagotchi.yaml
+infra/grafana/provisioning/datasources/tamagotchi.yaml
+infra/loki/loki.yaml
+infra/prometheus/alerts.yml
+infra/prometheus/prometheus.yml
+pom.xml
+recommendation-service/pom.xml
+recommendation-service/src/main/java/com/example/tamagotchi/recommendation/api/RecommendationController.java
+recommendation-service/src/main/java/com/example/tamagotchi/recommendation/config/SecurityConfig.java
+recommendation-service/src/main/java/com/example/tamagotchi/recommendation/service/DiagnosticMode.java
+recommendation-service/src/main/java/com/example/tamagotchi/recommendation/service/PetRecommendationService.java
+recommendation-service/src/main/resources/application.yml
+scripts/generate-recommendation-traffic.ps1
+scripts/set-diagnostic-mode.ps1
+src/main/java/com/example/tamagotchi/config/OAuthSecurityConfig.java
+src/main/resources/application.yml

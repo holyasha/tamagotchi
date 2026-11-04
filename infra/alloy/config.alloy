@@ -1,0 +1,17 @@
+local.file_match "tamagotchi_logs" {
+  path_targets = [
+    {"__path__" = "/var/log/tamagotchi/tamagotchi-gateway-service.log", "job" = "tamagotchi-apps", "service" = "tamagotchi-gateway-service"},
+    {"__path__" = "/var/log/tamagotchi/tamagotchi-pet-service.log", "job" = "tamagotchi-apps", "service" = "tamagotchi-pet-service"},
+    {"__path__" = "/var/log/tamagotchi/tamagotchi-recommendation-service.log", "job" = "tamagotchi-apps", "service" = "tamagotchi-recommendation-service"},
+  ]
+  sync_period = "5s"
+}
+
+loki.source.file "tamagotchi_logs" {
+  targets    = local.file_match.tamagotchi_logs.targets
+  forward_to = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+  endpoint { url = "http://loki:3100/loki/api/v1/push" }
+}
