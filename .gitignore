@@ -33,3 +33,6 @@ build/
 .vscode/
 
 examples/*
+
+# Local application logs
+runtime-logs/

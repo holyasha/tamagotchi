@@ -1,0 +1,79 @@
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        http-only: true
+        same-site: lax
+        secure: ${SESSION_COOKIE_SECURE:false}
+
+spring:
+  application:
+    name: tamagotchi-pet-service
+  datasource:
+    url: ${TAMAGOTCHI_DB_URL:jdbc:postgresql://localhost:5432/tamagotchi}
+    username: ${DB_USER:course}
+    password: ${DB_PASSWORD:course-dev-only}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OIDC_ISSUER:http://localhost:8085/realms/tamagotchi}
+          audiences: tamagotchi-pet-service
+      client:
+        provider:
+          keycloak:
+            token-uri: ${OIDC_TOKEN_URI:http://localhost:8085/realms/tamagotchi/protocol/openid-connect/token}
+        registration:
+          recommendation:
+            provider: keycloak
+            client-id: ${SERVICE_CLIENT_ID:tamagotchi-service-client}
+            client-secret: ${SERVICE_CLIENT_SECRET:tamagotchi-service-secret}
+            authorization-grant-type: client_credentials
+
+app:
+  recommendation:
+    base-url: ${RECOMMENDATION_URL:http://localhost:8083}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  otlp:
+    metrics:
+      export:
+        enabled: false
+  observations:
+    enable:
+      spring.security: false
+  tracing:
+    propagation:
+      type: w3c
+    sampling:
+      probability: ${TRACING_SAMPLING_PROBABILITY:1.0}
+  opentelemetry:
+    resource-attributes:
+      deployment.environment.name: local
+    tracing:
+      export:
+        otlp:
+          endpoint: ${OTEL_TRACES_ENDPOINT:http://localhost:4318/v1/traces}
+
+logging:
+  file:
+    name: ${LOG_DIR:runtime-logs}/tamagotchi-pet-service.log
+  include-application-name: false
+  pattern:
+    correlation: "[${spring.application.name:},trace_id=%X{traceId:-},span_id=%X{spanId:-},request_id=%X{requestId:-}] "

@@ -1,3 +1,4 @@
+
 package com.example.tamagotchi.config;
 
 import org.springframework.core.convert.converter.Converter;
@@ -13,19 +14,37 @@ import java.util.Map;
 import java.util.Set;
 
 public class JwtRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
-    private final JwtGrantedAuthoritiesConverter scopes = new JwtGrantedAuthoritiesConverter();
+    private final JwtGrantedAuthoritiesConverter scopes =
+            new JwtGrantedAuthoritiesConverter();
 
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
-        Set<GrantedAuthority> result = new LinkedHashSet<>(scopes.convert(jwt));
+        Set<GrantedAuthority> result =
+                new LinkedHashSet<>(scopes.convert(jwt));
+
         Object claim = jwt.getClaim("realm_access");
-        if (claim instanceof Map<?, ?> realm && realm.get("roles") instanceof Collection<?> roles) {
+
+        if (claim instanceof Map<?, ?> realm
+                && realm.get("roles") instanceof Collection<?> roles) {
+
             for (Object value : roles) {
-                if (value instanceof String role && Set.of("reader", "editor").contains(role)) {
-                    result.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase(Locale.ROOT)));
+                if (!(value instanceof String role)) {
+                    continue;
+                }
+
+                switch (role.toLowerCase(Locale.ROOT)) {
+                    case "reader" -> {
+                        result.add(new SimpleGrantedAuthority("ROLE_READER"));
+                        result.add(new SimpleGrantedAuthority("ROLE_OBSERVER"));
+                    }
+                    case "editor" -> {
+                        result.add(new SimpleGrantedAuthority("ROLE_EDITOR"));
+                        result.add(new SimpleGrantedAuthority("ROLE_PLAYER"));
+                    }
                 }
             }
         }
+
         return result;
     }
 }
